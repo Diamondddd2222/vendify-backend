@@ -21,7 +21,7 @@ export const validateRegister = [
     .notEmpty()
     .withMessage("A brand name is required")
     .isLength({ min: 3 })
-    .withMessage("Name must be at least 3 characters long"),
+    .withMessage("Brand name must be at least 3 characters long"),
 
   body("password")
     .notEmpty()
