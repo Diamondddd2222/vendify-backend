@@ -1,7 +1,7 @@
 // backend/routes/storeRoutes.js
 import express from "express";
 import multer from "multer";
-import authMiddleware from "../middleware/authMiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 import { createStore } from "../controllers/storeController.js";
 
 const router = express.Router();
