@@ -5,15 +5,16 @@ import cloudinary from "../config/cloudinary.js";
 
 export const createStore = async (req, res) => {
   try {
-    const { name,  description,category, email,phone } = req.body;
+    const { name, description, category, email, phone } = req.body;
     const userId = req.user?.id || req.body.userId; // authMiddleware should set req.user
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
-    if (!name || !category) return res.status(400).json({ message: "storeName and category are required" });
+    if (!name || !category) return res.status(400).json({ message: "Name and category are required" });
 
     // format storeLink (slug) and ensure uniqueness
     const baseSlug = name.toString().toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
     let storeLink = `${baseSlug}`;
+    
     // ensure unique by appending short id if collision
     const existing = await Store.findOne({ storeLink });
     if (existing) {
@@ -49,11 +50,11 @@ export const createStore = async (req, res) => {
       storeLink,
     });
 
-    // return store and the public store URL (frontend can build full url)
+    // return store and the public store URL
     res.status(201).json({
       message: "Store created successfully",
       store,
-      storeLink, // slug (frontend can show e.g. /stores/:storeLink)
+      storeLink,
     });
   } catch (error) {
     console.error("Error creating store:", error);
