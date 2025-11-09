@@ -7,7 +7,7 @@ const storeSchema = new mongoose.Schema(
     category: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
     phone: { type: Number, trim: true },
-    email: { type: String, trim: true },
+    email: { type: String, trim: true, unique: true },
     logoUrl: { type: String, default: "" },
     storeLink: { type: String, unique: true, required: true },
   },
