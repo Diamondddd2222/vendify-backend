@@ -1,21 +1,28 @@
 // middleware/uploadMiddleware.js
 // -----------------------------------------------------------------------------
-// This file handles all file upload logic using Multer.
-// It defines how and where files are stored, what file types are allowed,
-// and returns a configured `upload` instance you can use in routes.
+// Handles all file upload logic using Multer.
+// Defines how and where files are stored, what file types are allowed,
+// and exports a configured `upload` instance.
 // -----------------------------------------------------------------------------
 
 import multer from "multer";
 import path from "path";
+import fs from "fs"; // ✅ You forgot this import!
 
 // ---------------------- Storage Configuration ----------------------
-// The `storage` option tells Multer *where* to save files and *how* to name them.
-// Here we save uploaded files into an "uploads" folder with unique names.
+// Define the upload directory
+const uploadDir = "uploads";
+
+// ✅ Ensure that the uploads folder exists when the server starts
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log(`📁 Created missing directory: ${uploadDir}`);
+}
 
 const storage = multer.diskStorage({
   // Destination: defines where to store uploaded files.
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Make sure the folder exists before running the server.
+    cb(null, uploadDir); // Folder is guaranteed to exist now.
   },
 
   // Filename: defines the name format for each saved file.
@@ -34,11 +41,9 @@ const storage = multer.diskStorage({
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
 
-  // If file type is valid → accept it
   if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true);
+    cb(null, true); // Accept file
   } else {
-    // Otherwise, reject and send an error
     cb(new Error("Only image files are allowed (jpeg, png, jpg, gif)."));
   }
 };

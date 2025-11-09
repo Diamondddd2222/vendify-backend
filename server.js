@@ -8,8 +8,7 @@ import connectDB from "./config/db.js";
 // import orderRoutes from "./routes/orderRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import storeRoutes from "./routes/storeRoutes.js";
-import { upload } from "./middlewares/uploadMiddleware.js";
-import { storeValidationRules, validateStore } from "./middlewares/storeValidator.js";
+
 
 
 
@@ -23,7 +22,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json());
 
 app.use("/api/users", userRoutes);
-app.use("/api/store", upload.single("logo"),storeValidationRules(),validateStore,storeRoutes);
+app.use("/api/store",storeRoutes);
 
 // app.use("/api/auth", authRoutes);
 
