@@ -1,6 +1,7 @@
 // backend/controllers/storeController.js
 import fs from "fs";
 import Store from "../models/Store.js";
+import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js";
 
 export const createStore = async (req, res) => {
@@ -10,7 +11,12 @@ export const createStore = async (req, res) => {
 
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
     if (!name || !category) return res.status(400).json({ message: "Name and category are required" });
-
+    const emailExists = await Store.findOne({
+        email,
+    });
+    if (emailExists) {
+        return res.status(400).json({ message: "Email already in use for another store" });
+    }
     // format storeLink (slug) and ensure uniqueness
     const baseSlug = name.toString().toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
     let storeLink = `${baseSlug}`;
