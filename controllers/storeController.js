@@ -43,6 +43,8 @@ export const createStore = async (req, res) => {
       name,
       category,
       description,
+      email,
+      phone,
       logoUrl,
       storeLink,
     });
