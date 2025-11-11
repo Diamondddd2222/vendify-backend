@@ -18,7 +18,7 @@ router.post(
   createStore                 // 5️⃣ run controller logic
 );
 
-router.get("/my-store", authMiddleware, (req, res, next) => {
+router.get("/", authMiddleware, (req, res, next) => {
   console.log("Hit /my-store route", req.user);
   next();
 },
