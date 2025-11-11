@@ -1,36 +1,42 @@
 // backend/controllers/storeController.js
 import fs from "fs";
 import Store from "../models/Store.js";
-import User from "../models/User.js";
 import cloudinary from "../config/cloudinary.js";
 
 export const createStore = async (req, res) => {
   try {
     const { name, description, category, email, phone } = req.body;
-    const userId = req.user?.id || req.body.userId; // authMiddleware should set req.user
 
+    // Always use the logged-in user's ID from authMiddleware
+    const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
-    if (!name || !category) return res.status(400).json({ message: "Name and category are required" });
-    const emailExists = await Store.findOne({
-        email,
-    });
-    if (emailExists) {
-        return res.status(400).json({ message: "Email already in use for another store" });
-    }
-    // format storeLink (slug) and ensure uniqueness
-    const baseSlug = name.toString().toLowerCase().trim().replace(/\s+/g, "-").replace(/[^a-z0-9\-]/g, "");
-    let storeLink = `${baseSlug}`;
-    
-    // ensure unique by appending short id if collision
+
+    if (!name || !category)
+      return res.status(400).json({ message: "Name and category are required" });
+
+    // Check if email is already used
+    const emailExists = await Store.findOne({ email });
+    if (emailExists)
+      return res.status(400).json({ message: "Email already in use for another store" });
+
+    // Generate storeLink (slug)
+    const baseSlug = name
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9\-]/g, "");
+    let storeLink = baseSlug;
+
+    // Ensure unique storeLink
     const existing = await Store.findOne({ storeLink });
     if (existing) {
       storeLink = `${baseSlug}-${Date.now().toString().slice(-4)}`;
     }
 
-    // Upload logo to Cloudinary (if provided)
+    // Upload logo if provided
     let logoUrl = "";
     if (req.file) {
-      // upload the temporary file path to Cloudinary
       const result = await cloudinary.uploader.upload(req.file.path, {
         folder: "vendify/stores",
         use_filename: true,
@@ -38,15 +44,15 @@ export const createStore = async (req, res) => {
       });
       logoUrl = result.secure_url || result.url;
 
-      // remove temp file
+      // Remove temp file
       fs.unlink(req.file.path, (err) => {
         if (err) console.warn("Failed to remove temp file:", err);
       });
     }
 
-    // create store document
+    // Create the store document linked to this user
     const store = await Store.create({
-      userId,
+      userId,       // <-- attached to logged-in user
       name,
       category,
       description,
@@ -56,7 +62,7 @@ export const createStore = async (req, res) => {
       storeLink,
     });
 
-    // return store and the public store URL
+    // Return store info and public store URL
     res.status(201).json({
       message: "Store created successfully",
       store,
@@ -64,10 +70,31 @@ export const createStore = async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating store:", error);
-    // if multer left a file, try to remove it
+
+    // Cleanup temp file if exists
     if (req.file && req.file.path) {
       fs.unlink(req.file.path, () => {});
     }
+
     res.status(500).json({ message: "Failed to create store", error: error.message });
+  }
+};
+
+
+// GET /api/store/my-store
+export const getUserStore = async (req, res) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const store = await Store.findOne({ userId});
+    if (!store) {
+      return res.status(404).json({ message: "Please create a store to enjoy Vendify" });
+    }
+
+    res.status(200).json({ store });
+  } catch (error) {
+    console.error("Error fetching user store:", error);
+    res.status(500).json({ message: "Failed to fetch store info", error: error.message });
   }
 };

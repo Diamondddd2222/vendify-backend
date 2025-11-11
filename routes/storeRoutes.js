@@ -4,6 +4,7 @@ import { upload } from "../middlewares/uploadMiddleware.js";
 import { storeValidationRules, validateStore } from "../middlewares/storeValidator.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import { createStore } from "../controllers/storeController.js";
+import { getUserStore } from "../controllers/storeController.js";
 
 const router = express.Router();
 
@@ -16,5 +17,11 @@ router.post(
   validateStore,              // 4️⃣ send validation errors if any
   createStore                 // 5️⃣ run controller logic
 );
+
+router.get("/my-store", authMiddleware, (req, res, next) => {
+  console.log("Hit /my-store route", req.user);
+  next();
+},
+  getUserStore);
 
 export default router;
