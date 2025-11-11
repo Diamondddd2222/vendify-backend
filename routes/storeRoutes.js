@@ -1,4 +1,5 @@
 // backend/routes/storeRoutes.js
+import multer from "multer"; // add this
 import express from "express";
 import { upload } from "../middlewares/uploadMiddleware.js";
 import { storeValidationRules, validateStore } from "../middlewares/storeValidator.js";
