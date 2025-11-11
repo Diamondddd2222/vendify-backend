@@ -9,14 +9,39 @@ import { getUserStore } from "../controllers/storeController.js";
 const router = express.Router();
 
 
+// router.post(
+//   "/create",
+//   authMiddleware,             
+//   upload.single("logo"),    
+//   storeValidationRules(),     
+//   validateStore,              
+//   createStore                 
+// );
+
 router.post(
   "/create",
-  authMiddleware,             // 1️⃣ verify token
-  upload.single("logo"),      // 2️⃣ handle file upload
-  storeValidationRules(),     // 3️⃣ validate fields
-  validateStore,              // 4️⃣ send validation errors if any
-  createStore                 // 5️⃣ run controller logic
+  authMiddleware,             
+   (req, res, next) => {
+    // Wrap multer to handle errors directly
+    upload.single("logo")(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === "LIMIT_FILE_SIZE") {
+          return res.status(400).json({ message: "File too large. Max size is 10MB." });
+        }
+        return res.status(400).json({ message: err.message });
+      } else if (err) {
+        return res.status(400).json({ message: err.message });
+      }
+      next(); // proceed to validation & controller
+    });
+  },    
+  storeValidationRules(),     
+  validateStore,              
+  createStore                 
 );
+
+
+
 
 router.get("/", authMiddleware, (req, res, next) => {
   console.log("Hit /my-store route", req.user);
