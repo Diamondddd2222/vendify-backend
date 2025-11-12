@@ -4,8 +4,8 @@ import express from "express";
 import { upload } from "../middlewares/uploadMiddleware.js";
 import { storeValidationRules, validateStore } from "../middlewares/storeValidator.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
-import { createStore } from "../controllers/storeController.js";
-import { getUserStore } from "../controllers/storeController.js";
+// import {  } from "../controllers/storeController.js";
+import { getUserStore, createStore, getAllStores} from "../controllers/storeController.js";
 
 const router = express.Router();
 
@@ -41,7 +41,7 @@ router.post(
   createStore                 
 );
 
-
+router.get("/reqstores", getAllStores); 
 
 
 router.get("/", authMiddleware, (req, res, next) => {

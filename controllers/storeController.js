@@ -98,3 +98,15 @@ export const getUserStore = async (req, res) => {
     res.status(500).json({ message: "Failed to fetch store info", error: error.message });
   }
 };
+
+// GET /api/stores/reqstores
+export const getAllStores =  async (req, res) => {
+  try {
+    const allStores = await Store.find().sort({ createdAt: -1 }); // newest first
+    res.status(200).json({ success: true, allStores });
+  } catch (error) {
+    console.error("Error fetching stores:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
