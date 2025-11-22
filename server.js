@@ -8,6 +8,7 @@ import connectDB from "./config/db.js";
 // import orderRoutes from "./routes/orderRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import storeRoutes from "./routes/storeRoutes.js";
+import statusRoutes from "./routes/statusRoutes.js"
 
 
 
@@ -23,6 +24,7 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/stores",storeRoutes);
+app.use("/api/status",statusRoutes)
 
 
 // app.use("/api/auth", authRoutes);

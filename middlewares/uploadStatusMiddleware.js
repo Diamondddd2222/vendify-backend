@@ -9,20 +9,21 @@ import multer from "multer";
 import path from "path";
 import fs from "fs"; 
 
+
 // ---------------------- Storage Configuration ----------------------
 // Define the upload directory
-const uploadDir = "uploads";
+export const uploadDirStatus = "uploadsStatus";
 
 // ✅ Ensure that the uploads folder exists when the server starts
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-  console.log(`📁 Created missing directory: ${uploadDir}`);
+if (!fs.existsSync(uploadDirStatus)) {
+  fs.mkdirSync(uploadDirStatus, { recursive: true });
+  console.log(`📁 Created missing directory: ${uploadDirStatus}`);
 }
 
 const storage = multer.diskStorage({
   // Destination: defines where to store uploaded files.
   destination: (req, file, cb) => {
-    cb(null, uploadDir); // Folder is guaranteed to exist now.
+    cb(null, uploadDirStatus); // Folder is guaranteed to exist now.
   },
 
   // Filename: defines the name format for each saved file.
@@ -34,28 +35,21 @@ const storage = multer.diskStorage({
   },
 });
 
-// ---------------------- File Type Filtering ----------------------
-// This function decides whether to accept or reject an uploaded file.
-// Only certain image MIME types are allowed.
-
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
-
-  if (allowedTypes.includes(file.mimetype)) {
-    cb(null, true); // Accept file
+  const imageTypes = ["image/jpeg", "image/png", "image/jpg", "image/gif"];
+  const videoTypes = ["video/mp4", "video/webm", "video/ogg", "video/quicktime", "video/mpeg"];
+  if (imageTypes.includes(file.mimetype) || videoTypes.includes(file.mimetype)) {
+    cb(null, true);
   } else {
-    cb(new Error("Only image files are allowed (jpeg, png, jpg, gif)."));
+    cb(new Error("Only image and video files are allowed."), false);
   }
 };
 
-
-
-
-// ---------------------- Multer Setup ----------------------
-// Create and export a Multer instance configured with our settings.
-
+// Global limit set to max video size (20MB). We'll check images smaller later.
 export const upload = multer({
-  storage,       // Use our custom storage logic
-  fileFilter,    // Apply file type filtering
-  limits: { fileSize: 10 * 1024 * 1024 }, // Optional: max file size = 5MB
+  storage,
+  fileFilter,
+  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
 });
+
+export default upload;
