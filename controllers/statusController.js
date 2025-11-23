@@ -23,7 +23,7 @@ export const uploadStatusMedia = async (req, res) => {
     console.log("File path:", filePath);
 
     // Upload to Cloudinary
-    const result = await cloudinary.v2.uploader.upload(filePath, {
+    const result = await cloudinary.uploader.upload(filePath, {
       folder: "vendify/statuses",
       resource_type: "auto",
     });
