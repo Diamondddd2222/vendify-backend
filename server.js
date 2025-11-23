@@ -24,7 +24,9 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/stores",storeRoutes);
-app.use("/api/status",statusRoutes)
+app.use("/api/status",
+    
+    statusRoutes)
 
 
 // app.use("/api/auth", authRoutes);

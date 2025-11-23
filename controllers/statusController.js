@@ -9,12 +9,18 @@ import { uploadDirStatus } from "../middlewares/uploadStatusMiddleware.js";
 // -------------------------------
 export const uploadStatusMedia = async (req, res) => {
   try {
+    console.log("🔥 FILE RECEIVED:", req.file);
+    console.log("🔥 USER:", req.user)
     const userId = req.user?.id;
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
-
+    if (!fs.existsSync(uploadDirStatus)) {
+    fs.mkdirSync(uploadDirStatus, { recursive: true });
+    }
     const filePath = path.join(uploadDirStatus, req.file.filename);
+    console.log("req.file:", req.file);
+    console.log("File path:", filePath);
 
     // Upload to Cloudinary
     const result = await cloudinary.v2.uploader.upload(filePath, {
