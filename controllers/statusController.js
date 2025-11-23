@@ -78,3 +78,33 @@ export const createStatus = async (req, res) => {
     return res.status(500).json({ message: "Failed to create status", error: error.message });
   }
 };
+
+
+// Fetch all statuses
+export const getAllStatuses = async (req, res) => {
+  try {
+    const statuses = await Status.find()
+      .sort({ createdAt: -1 }) // newest first
+      .populate("user", "storeName logo");
+
+    res.status(200).json({ statuses });
+  } catch (error) {
+    console.error("Get statuses error:", error);
+    res.status(500).json({ message: "Failed to fetch statuses", error: error.message });
+  }
+};
+
+// Fetch statuses by user ID
+export const getUserStatuses = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const statuses = await Status.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .populate("user", "storeName logo");
+
+    res.status(200).json({ statuses });
+  } catch (error) {
+    console.error("Get user statuses error:", error);
+    res.status(500).json({ message: "Failed to fetch user statuses", error: error.message });
+  }
+};
