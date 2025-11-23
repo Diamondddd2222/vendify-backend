@@ -54,13 +54,13 @@ export const createStatus = async (req, res) => {
   try {
     const userId = req.user?.id;
     const { storeId, mediaUrl, mediaType, caption } = req.body;
-
+     console.log(req.body)
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     if (!mediaUrl) return res.status(400).json({ message: "Media URL missing" });
 
     const newStatus = await Status.create({
-      user: userId,
+      userId,
       storeId,
       mediaUrl,
       mediaType,
