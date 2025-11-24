@@ -54,21 +54,28 @@ export const uploadStatusMedia = async (req, res) => {
 export const createStatus = async (req, res) => {
   try {
     const userId = req.user?.id;
-    const { storeId, mediaUrl, mediaType, caption } = req.body;
-     console.log(req.body)
-     const user = await User.findById(req.user.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    if (!mediaUrl) return res.status(400).json({ message: "Media URL missing" });
+    const { storeId, mediaUrl, mediaType, caption } = req.body;
+
+    if (!mediaUrl || !mediaType) {
+      return res.status(400).json({ message: "Media URL or mediaType missing" });
+    }
+
+    // Get logged-in user
+    const user = await User.findById(userId).select("brandName storeName");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Choose correct brand field
+    const brandName = user.brandName || user.storeName || "Unknown Brand";
 
     const newStatus = await Status.create({
       userId,
-      brandName: user.brandName,
+      brandName,       // ⭐ save brand name
       storeId,
       mediaUrl,
       mediaType,
       caption: caption || "",
-      createdAt: new Date(),
     });
 
     return res.status(201).json({
@@ -78,7 +85,10 @@ export const createStatus = async (req, res) => {
 
   } catch (error) {
     console.error("Create status error:", error);
-    return res.status(500).json({ message: "Failed to create status", error: error.message });
+    return res.status(500).json({
+      message: "Failed to create status",
+      error: error.message,
+    });
   }
 };
 
