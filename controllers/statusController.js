@@ -98,7 +98,7 @@ export const getAllStatuses = async (req, res) => {
   try {
     const statuses = await Status.find()
       .sort({ createdAt: -1 }) // newest first
-      .populate("userId", "storeName logo");
+      .populate("userId", "storeName logo brandName");
 
     res.status(200).json({ statuses });
   } catch (error) {
