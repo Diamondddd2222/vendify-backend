@@ -3,6 +3,7 @@ import path from "path";
 import Status from "../models/Status.js";
 import cloudinary from "../config/cloudinary.js";
 import { uploadDirStatus } from "../middlewares/uploadStatusMiddleware.js";
+import User from "../models/User.js";
 
 // -------------------------------
 // 1️⃣ Upload media only
@@ -55,12 +56,14 @@ export const createStatus = async (req, res) => {
     const userId = req.user?.id;
     const { storeId, mediaUrl, mediaType, caption } = req.body;
      console.log(req.body)
+     const user = await User.findById(req.user.id);
     if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
     if (!mediaUrl) return res.status(400).json({ message: "Media URL missing" });
 
     const newStatus = await Status.create({
       userId,
+      brandName: user.brandName,
       storeId,
       mediaUrl,
       mediaType,
