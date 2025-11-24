@@ -113,7 +113,7 @@ export const getUserStatuses = async (req, res) => {
     const { userId } = req.params;
     const statuses = await Status.find({ user: userId })
       .sort({ createdAt: -1 })
-      .populate("userId", "storeName logo");
+      .populate("userId", "storeName logoUrl brandName");
 
     res.status(200).json({ statuses });
   } catch (error) {
